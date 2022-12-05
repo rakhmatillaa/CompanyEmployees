@@ -2,6 +2,7 @@
 using Entities;
 using LoggerService;
 using Microsoft.EntityFrameworkCore;
+using Repository;
 
 namespace CompanyEmployees.Extensions
 {
@@ -26,6 +27,9 @@ namespace CompanyEmployees.Extensions
             services.AddScoped<ILoggerManager, LoggerManager>();
 
         public static void ConfigureNpgsqlContext(this IServiceCollection services, IConfiguration configuration) =>
-            services.AddDbContext<RepositoryContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnectionString"),a=>a.MigrationsAssembly("CompanyEmployees")));
+            services.AddDbContext<RepositoryContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnectionString"), a => a.MigrationsAssembly("CompanyEmployees")));
+
+        public static void ConfigureRepositoryManager(this IServiceCollection services) =>
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
     }
 }

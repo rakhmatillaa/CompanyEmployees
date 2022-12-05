@@ -8,6 +8,7 @@ builder.Services.ConfigureNpgsqlContext(builder.Configuration);
 
 // Add services to the container.
 // Register dependent services here: (ConfigureServices)
+builder.Services.ConfigureRepositoryManager();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

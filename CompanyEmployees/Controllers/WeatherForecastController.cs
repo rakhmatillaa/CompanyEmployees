@@ -3,25 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CompanyEmployees.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
+    [ApiController]
     public class WeatherForecastController : ControllerBase
     {
-        private ILoggerManager logger;
-        public WeatherForecastController(ILoggerManager logger)
+        private readonly IRepositoryManager _repository;
+        public WeatherForecastController(IRepositoryManager repository)
         {
-            this.logger = logger;
+            _repository = repository;
         }
 
         [HttpGet]
-        public IEnumerable<string> Get()
+        public ActionResult<IEnumerable<string>> Get()
         {
-            logger.LogInfo("Here is info message from our values controller.");
-            logger.LogDebug("Here is debug message from our values controller.");
-            logger.LogWarn("Here is our warning message from our values controller.");
-            logger.LogError("Here is our error message from our values controller.");
+            _repository.Company.AnyMethodFromCompanyRepository();
+            _repository.Employee.AnyMethodFromCompanyRepository();
 
             return new string[] { "value1", "value2" };
         }
     }
-}
