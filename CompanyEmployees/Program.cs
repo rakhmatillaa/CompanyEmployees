@@ -3,6 +3,9 @@ using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Connect database
+builder.Services.ConfigureNpgsqlContext(builder.Configuration);
+
 // Add services to the container.
 // Register dependent services here: (ConfigureServices)
 builder.Services.AddControllers();

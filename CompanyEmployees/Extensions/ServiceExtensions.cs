@@ -1,5 +1,7 @@
 ﻿using Contracts;
+using Entities;
 using LoggerService;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompanyEmployees.Extensions
 {
@@ -13,12 +15,17 @@ namespace CompanyEmployees.Extensions
                 .AllowAnyMethod()
                 .AllowAnyHeader());
             });
+
         public static void ConfigureIISIntegration(this IServiceCollection services) =>
             services.Configure<IISOptions>(options =>
             {
 
             });
+
         public static void ConfigureLoggerService(this IServiceCollection services) =>
             services.AddScoped<ILoggerManager, LoggerManager>();
+
+        public static void ConfigureNpgsqlContext(this IServiceCollection services, IConfiguration configuration) =>
+            services.AddDbContext<RepositoryContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnectionString"),a=>a.MigrationsAssembly("CompanyEmployees")));
     }
 }
