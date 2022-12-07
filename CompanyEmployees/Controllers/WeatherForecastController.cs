@@ -16,9 +16,10 @@ namespace CompanyEmployees.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            _repository.Company.AnyMethodFromCompanyRepository();
-            _repository.Employee.AnyMethodFromCompanyRepository();
+            //_repository.Company.;
+            //_repository.Employee.AnyMethodFromCompanyRepository();
 
             return new string[] { "value1", "value2" };
         }
     }
+}
