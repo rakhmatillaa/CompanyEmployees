@@ -1,7 +1,10 @@
 using CompanyEmployees.Extensions;
+using Contracts;
 using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//ILoggerManager logger = builder.Services.BuildServiceProvider().GetRequiredService<ILoggerManager>();
 
 // Connect database
 builder.Services.ConfigureNpgsqlContext(builder.Configuration);
@@ -30,12 +33,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
 
+// Logging in .NET6 
+//app.ConfigureExceptionHandler(logger);
 app.UseHttpsRedirection();
 
 // It enables using static fields for the request. If a path to the static files directory isn't set, a "wwwroot" folder in our project will be used by default

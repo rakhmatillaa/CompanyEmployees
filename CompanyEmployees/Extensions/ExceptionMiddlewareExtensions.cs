@@ -5,7 +5,7 @@ using System.Net;
 
 namespace CompanyEmployees.Extensions
 {
-    static class ExceptionMiddlewareExtensions
+    public static class ExceptionMiddlewareExtensions
     {
         public static void ConfigureExceptionHandler(this IApplicationBuilder app, ILoggerManager logger)
         {

@@ -6,7 +6,7 @@ using Repository;
 
 namespace CompanyEmployees.Extensions
 {
-    static public class ServiceExtensions
+    public static class ServiceExtensions
     {
         public static void ConfigureCors(this IServiceCollection services) =>
             services.AddCors(options =>
