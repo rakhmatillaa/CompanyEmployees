@@ -4,7 +4,6 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 
 namespace CompanyEmployees.Controllers
 {
@@ -16,7 +15,7 @@ namespace CompanyEmployees.Controllers
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
 
-        public CompaniesController(IRepositoryManager repository, ILoggerManager logger,IMapper mapper)
+        public CompaniesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
@@ -33,10 +32,10 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpGet("{id}", Name ="CompanyById")]
+        [HttpGet("{id}", Name = "CompanyById")]
         public IActionResult GetCompany(Guid id)
         {
-            var company =_repository.Company.GetCompany(id,trackChanges: false);
+            var company = _repository.Company.GetCompany(id, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
@@ -44,13 +43,13 @@ namespace CompanyEmployees.Controllers
             }
             else
             {
-                var companyDto=_mapper.Map<CompanyDto>(company);
+                var companyDto = _mapper.Map<CompanyDto>(company);
                 return Ok(companyDto);
             }
         }
 
         [HttpPost]
-        public IActionResult CreateCompany([FromBody]CompanyForCreationDto company)
+        public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
         {
             if (company == null)
             {
@@ -65,11 +64,11 @@ namespace CompanyEmployees.Controllers
 
             var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
 
-            return CreatedAtRoute("CompanyById", new { id = companyToReturn.Id },companyToReturn);
+            return CreatedAtRoute("CompanyById", new { id = companyToReturn.Id }, companyToReturn);
         }
 
-        [HttpGet("collection/({ids})",Name ="CompanyCollection")]
-        public IActionResult GetCompanyCollection([ModelBinder(BinderType =typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
+        [HttpGet("collection/({ids})", Name = "CompanyCollection")]
+        public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         {
             if (ids == null)
             {
@@ -77,7 +76,7 @@ namespace CompanyEmployees.Controllers
                 return BadRequest("Parameter ids is null");
             }
 
-            var companyEntities=_repository.Company.GetByIds(ids, trackChanges: false);
+            var companyEntities = _repository.Company.GetByIds(ids, trackChanges: false);
 
             if (ids.Count() != companyEntities.Count())
             {
@@ -85,7 +84,7 @@ namespace CompanyEmployees.Controllers
                 return NotFound();
             }
 
-            var companiesToReturn=_mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
+            var companiesToReturn = _mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
             return Ok(companiesToReturn);
         }
 
@@ -99,7 +98,7 @@ namespace CompanyEmployees.Controllers
             }
 
             var companyEntities = _mapper.Map<IEnumerable<Company>>(companyCollection);
-            foreach(var company in companyEntities)
+            foreach (var company in companyEntities)
             {
                 _repository.Company.CreateCompany(company);
             }
@@ -107,9 +106,9 @@ namespace CompanyEmployees.Controllers
             _repository.Save();
 
             var companyCollectionToReturn = _mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
-            var ids=string.Join(", ", companyCollectionToReturn.Select(c=>c.Id));
+            var ids = string.Join(", ", companyCollectionToReturn.Select(c => c.Id));
 
-            return CreatedAtRoute("CompanyCollection", new {ids},companyCollectionToReturn);
+            return CreatedAtRoute("CompanyCollection", new { ids }, companyCollectionToReturn);
         }
 
 

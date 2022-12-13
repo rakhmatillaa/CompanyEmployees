@@ -2,6 +2,7 @@ using CompanyEmployees.Extensions;
 using Contracts;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +27,22 @@ builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerService();
 
+var logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .Enrich.FromLogContext()
+        .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
 // !!!The code below must have been added to the constructor of Startup class
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
 "/nlog.config"));
 
 var app = builder.Build();
 // Register middleware here: (Configure)  //(don't forget that order matters!)
+
+app.UseMiddleware(typeof(ExceptionHandlingMiddleware)); // exception handling middleware
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
