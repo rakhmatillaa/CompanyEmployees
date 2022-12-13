@@ -9,7 +9,13 @@ builder.Services.ConfigureNpgsqlContext(builder.Configuration);
 // Add services to the container.
 // Register dependent services here: (ConfigureServices)
 builder.Services.ConfigureRepositoryManager();
-builder.Services.AddControllers();
+
+builder.Services.AddControllers(config =>
+{
+    config.RespectBrowserAcceptHeader = true;
+    config.ReturnHttpNotAcceptable = true;
+}).AddXmlDataContractSerializerFormatters()
+  .AddCustomCSVFormatter(); // custom formatter (CsvOutputFormatter)
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,11 +35,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
