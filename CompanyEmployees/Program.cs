@@ -1,6 +1,4 @@
 using CompanyEmployees.Extensions;
-using Contracts;
-using Microsoft.Extensions.Logging;
 using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +12,7 @@ builder.Services.ConfigureRepositoryManager();
 
 builder.Services.AddControllers(config =>
 {
-    config.RespectBrowserAcceptHeader= true;
+    config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
 }).AddXmlDataContractSerializerFormatters()
   .AddCustomCSVFormatter(); // custom formatter (CsvOutputFormatter)
