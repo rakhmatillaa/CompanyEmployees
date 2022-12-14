@@ -1,5 +1,6 @@
 using CompanyEmployees.Extensions;
 using NLog;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +18,18 @@ builder.Services.AddControllers(config =>
 }).AddXmlDataContractSerializerFormatters()
   .AddCustomCSVFormatter(); // custom formatter (CsvOutputFormatter)
 
+var logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .Enrich.FromLogContext()
+        .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
-builder.Services.ConfigureLoggerService();
 
 // !!!The code below must have been added to the constructor of Startup class
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
@@ -30,6 +37,9 @@ LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
 
 var app = builder.Build();
 // Register middleware here: (Configure)  //(don't forget that order matters!)
+
+app.UseMiddleware(typeof(ExceptionHandlingMiddleware)); // exception handling middleware
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -1,6 +1,5 @@
 ﻿using Contracts;
 using Entities;
-using LoggerService;
 using Microsoft.EntityFrameworkCore;
 using Repository;
 
@@ -22,9 +21,6 @@ namespace CompanyEmployees.Extensions
             {
 
             });
-
-        public static void ConfigureLoggerService(this IServiceCollection services) =>
-            services.AddScoped<ILoggerManager, LoggerManager>();
 
         public static void ConfigureNpgsqlContext(this IServiceCollection services, IConfiguration configuration) =>
             services.AddDbContext<RepositoryContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnectionString"), a => a.MigrationsAssembly("CompanyEmployees")));
