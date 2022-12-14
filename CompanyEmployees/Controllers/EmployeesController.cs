@@ -11,10 +11,10 @@ namespace CompanyEmployees.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
-        private readonly ILoggerManager _logger;
+        private readonly ILogger<CompaniesController> _logger;
         private readonly IMapper _mapper;
 
-        public EmployeesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        public EmployeesController(IRepositoryManager repository, ILogger<CompaniesController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
@@ -27,7 +27,7 @@ namespace CompanyEmployees.Controllers
             var company = _repository.Company.GetCompany(companyId, trackChanges: false);
             if (company == null)
             {
-                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+                _logger.LogInformation($"Company with id: {companyId} doesn't exist in the database.");
                 return NotFound();
             }
 
@@ -43,14 +43,14 @@ namespace CompanyEmployees.Controllers
             var company = _repository.Company.GetCompany(companyId, trackChanges: false);
             if (company == null)
             {
-                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+                _logger.LogInformation($"Company with id: {companyId} doesn't exist in the database.");
                 return NotFound();
             }
 
             var employeeDb = _repository.Employee.GetEmployee(companyId, id, trackChanges: false);
             if (employeeDb == null)
             {
-                _logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
+                _logger.LogInformation($"Employee with id: {id} doesn't exist in the database.");
                 return NotFound();
             }
 
@@ -70,7 +70,7 @@ namespace CompanyEmployees.Controllers
             var company = _repository.Company.GetCompany(companyId, trackChanges: false);
             if (company == null)
             {
-                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+                _logger.LogInformation($"Company with id: {companyId} doesn't exist in the database.");
                 return NotFound();
             }
 

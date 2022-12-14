@@ -12,10 +12,10 @@ namespace CompanyEmployees.Controllers
     public class CompaniesController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
-        private readonly ILoggerManager _logger;
+        private readonly ILogger<CompaniesController> _logger;
         private readonly IMapper _mapper;
 
-        public CompaniesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        public CompaniesController(IRepositoryManager repository,ILogger<CompaniesController> logger,IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
@@ -28,6 +28,7 @@ namespace CompanyEmployees.Controllers
             var companies = _repository.Company.GetAllCompanies(trackChanges: false);
 
             var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+            _logger.LogInformation($"Company with id: doesn't exist in the database.");
 
             return Ok(companiesDto);
         }
@@ -38,7 +39,7 @@ namespace CompanyEmployees.Controllers
             var company = _repository.Company.GetCompany(id, trackChanges: false);
             if (company == null)
             {
-                _logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
+                _logger.LogInformation($"Company with id: {id} doesn't exist in the database.");
                 return NotFound();// returns 404 status code
             }
             else

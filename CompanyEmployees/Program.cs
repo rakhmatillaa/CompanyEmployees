@@ -20,19 +20,18 @@ builder.Services.AddControllers(config =>
 }).AddXmlDataContractSerializerFormatters()
   .AddCustomCSVFormatter(); // custom formatter (CsvOutputFormatter)
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.ConfigureCors();
-builder.Services.ConfigureIISIntegration();
-builder.Services.ConfigureLoggerService();
-
 var logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)
         .Enrich.FromLogContext()
         .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.ConfigureCors();
+builder.Services.ConfigureIISIntegration();
 
 // !!!The code below must have been added to the constructor of Startup class
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
