@@ -1,4 +1,6 @@
 using CompanyEmployees.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using NLog;
 using Serilog;
 
@@ -30,6 +32,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 // !!!The code below must have been added to the constructor of Startup class
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
