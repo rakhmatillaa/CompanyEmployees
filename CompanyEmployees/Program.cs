@@ -1,3 +1,4 @@
+using CompanyEmployees.ActionFilters;
 using CompanyEmployees.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -26,7 +27,7 @@ var logger = new LoggerConfiguration()
         .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
-
+builder.Services.AddSoped<ValidationFilterAttribute>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
