@@ -7,8 +7,8 @@ namespace CompanyEmployees.ActionFilters
     public class ValidateCompanyExistsAttribute : IAsyncActionFilter
     {
         private readonly IRepositoryManager _repository;
-        private readonly ILogger _logger;
-        public ValidateCompanyExistsAttribute(IRepositoryManager repository, ILogger logger)
+        private readonly ILogger<ValidateCompanyExistsAttribute> _logger;
+        public ValidateCompanyExistsAttribute(IRepositoryManager repository, ILogger<ValidateCompanyExistsAttribute> logger)
         {
             _repository = repository;
             _logger = logger;

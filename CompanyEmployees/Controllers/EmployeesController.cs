@@ -3,7 +3,9 @@ using CompanyEmployees.ActionFilters;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CompanyEmployees.Controllers
 {
@@ -23,7 +25,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
             var company =await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
@@ -32,7 +34,9 @@ namespace CompanyEmployees.Controllers
                 return NotFound();
             }
 
-            var employeesFromDb =await _repository.Employee.GetEmployeesAsync(companyId, trackChanges: false);
+            var employeesFromDb =await _repository.Employee.GetEmployeesAsync(companyId,employeeParameters, trackChanges: false);
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(employeesFromDb.MetaData));
 
             var employeesDto = _mapper.Map<IEnumerable<Employee>>(employeesFromDb);
             return Ok(employeesDto);
