@@ -1,30 +1,32 @@
 ﻿using AutoMapper;
-using AutoMapper.Configuration;
 using CompanyEmployees.ActionFilters;
 using CompanyEmployees.ModelBinders;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CompanyEmployees.Controllers
 {
+    [ApiVersion("1.0")]
     [Route("api/companies")]
     [ApiController]
+    //[ResponseCache(CacheProfileName ="120SecondsDuration")]
     public class CompaniesController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
         private readonly ILogger<CompaniesController> _logger;
         private readonly IMapper _mapper;
 
-        public CompaniesController(IRepositoryManager repository,ILogger<CompaniesController> logger,IMapper mapper)
+        public CompaniesController(IRepositoryManager repository, ILogger<CompaniesController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetCompanies")]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges: false);
@@ -36,6 +38,8 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
+        [HttpCacheExpiration(CacheLocation=CacheLocation.Public, MaxAge =60)]
+        [HttpCacheValidation(MustRevalidate =false)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
             var company = await _repository.Company.GetCompanyAsync(id, trackChanges: false);
@@ -51,7 +55,7 @@ namespace CompanyEmployees.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateCompany")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
         {
@@ -111,7 +115,7 @@ namespace CompanyEmployees.Controllers
 
         [HttpDelete("{id}")]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
-        public async Task<IActionResult> DeleteCompany(Guid id) 
+        public async Task<IActionResult> DeleteCompany(Guid id)
         {
             var company = HttpContext.Items["company"] as Company;
 
@@ -132,6 +136,14 @@ namespace CompanyEmployees.Controllers
             await _repository.SaveAsync();
 
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult GetCompaniesOptions()
+        {
+            Response.Headers.TryAdd("Allow", "GET", "OPTIONS", "POST");
+
+            return Ok();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CompanyEmployees.ActionFilters;
+using CompanyEmployees.Utility;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
@@ -16,33 +17,40 @@ namespace CompanyEmployees.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILogger<CompaniesController> _logger;
         private readonly IMapper _mapper;
+        private readonly EmployeeLinks _employeeLinks;
 
-        public EmployeesController(IRepositoryManager repository, ILogger<CompaniesController> logger, IMapper mapper)
+        public EmployeesController(IRepositoryManager repository, ILogger<CompaniesController> logger, IMapper mapper, EmployeeLinks employeeLinks)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _employeeLinks = employeeLinks;
         }
 
         [HttpGet]
+        [HttpHead]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
             if (!employeeParameters.ValidAgeRange)
                 return BadRequest("Max age can't be less than min age.");
 
-            var company =await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
+            var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInformation($"Company with id: {companyId} doesn't exist in the database.");
                 return NotFound();
             }
 
-            var employeesFromDb =await _repository.Employee.GetEmployeesAsync(companyId,employeeParameters, trackChanges: false);
+            var employeesFromDb = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
 
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(employeesFromDb.MetaData));
 
             var employeesDto = _mapper.Map<IEnumerable<Employee>>(employeesFromDb);
-            return Ok(employeesDto);
+
+            var links = _employeeLinks.TryGenerateLinks((IEnumerable<EmployeeDto>)employeesDto, employeeParameters.Fields, companyId, HttpContext);
+
+            return links.HasLinks ? Ok(links.LinkedEntities) : Ok(links.ShapedEntities);
         }
 
         [HttpGet("{id}")]
@@ -70,7 +78,7 @@ namespace CompanyEmployees.Controllers
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee)
         {
-            var company =await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
+            var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInformation($"Company with id: {companyId} doesn't exist in the database.");
